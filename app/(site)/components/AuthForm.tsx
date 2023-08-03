@@ -4,6 +4,7 @@ import Button from "@/app/components/Button";
 import Input from "@/app/components/Input";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { post } from '../http/index';
 
 type Variant = 'LOGIN' | 'REGISTER'
@@ -44,14 +45,16 @@ export default function AuthForm() {
       if (success) {
         console.log(data)
       } else {
-        console.log(message)
+        toast.error(message)
+        // console.log(message)
       }
     } else if (variant === 'LOGIN') {
       const { success, data, message } = await post('/api/login', body)
       if (success) {
         console.log(data)
       } else {
-        console.log(message)
+        toast.error(message)
+        // console.log(message)
       }
     }
     setIsLoading(false)
