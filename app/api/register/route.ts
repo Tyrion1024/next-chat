@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import Prisma from '@/app/libs/prismadb';
-import { NextResponse } from 'next/server';
+import { resultHandler } from '@/app/api/util';
 
 
 export async function POST(
@@ -16,9 +16,9 @@ export async function POST(
     } = body;
   
     if (!email || !name || !password) {
-      return new NextResponse('Missing info', { status: 400 })
+      return resultHandler(null, 400, 'Missing info')
     }
-  
+
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await Prisma.user.create({
       data: {
@@ -28,9 +28,10 @@ export async function POST(
       }
     });
 
-    return NextResponse.json(user)
+    return resultHandler(user)
+
   } catch(err: any) {
-    return new NextResponse('Server Error', { status: 500, statusText: err.message })
+    return resultHandler(null, 500, `Server Error: ${err.message}`)
   }
 
 }

@@ -1,4 +1,5 @@
-// Example POST method implementation:
+import { signIn } from "next-auth/react";
+
 export async function post(url = "", data = {}) {
   // Default options are marked with *
   const response = await fetch(url, {
@@ -15,21 +16,7 @@ export async function post(url = "", data = {}) {
     body: JSON.stringify(data), // body data type must match "Content-Type" header
   });
 
-  console.log(response)
-
-  if (response.status === 200) {
-    return {
-      success: true,
-      data: response.json(),
-      message: ''
-    }
-  } else {
-    return {
-      success: false,
-      message: response.statusText,
-      data: null
-    }
-  }
+  return response.json()
 
 }
 
@@ -58,17 +45,19 @@ export async function get(url: string, params = {}, data = {}) {
   });
 
 
-  if (response.status === 200) {
-    return {
-      success: true,
-      data: response.json(),
-      message: ''
-    }
-  } else {
-    return {
-      success: false,
-      message: response.statusText,
-      data: null
-    }
+  return response.json()
+
+}
+
+export const login = async (method: string, data = {}, config = {}) => {
+  const response = await signIn(method, {
+    ...data,
+    ...config
+  })
+
+  return {
+    success: !response?.error,
+    message: response?.error || '',
+    data: null
   }
 }
