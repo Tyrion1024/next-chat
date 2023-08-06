@@ -48,7 +48,7 @@ export default function AuthForm() {
   const onSubmit: SubmitHandler<FieldValues> = async (body) => {
     setIsLoading(true)
     if (variant === 'REGISTER') {
-      const { success, message } = await post('/api/register', body)
+      const { success, message } = await post('/api/users/register', body)
       if (success) {
         await handlerlogin('credentials', body)
       } else {
