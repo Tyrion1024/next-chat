@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
-import { post } from "@/app/(site)/http"
+import { post } from "@/app/http"
 
 import { User } from ".prisma/client"
 import { toast } from "react-hot-toast"

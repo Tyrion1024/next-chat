@@ -5,7 +5,7 @@ import Input from "@/app/components/Input";
 import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { post, login } from '../http/index';
+import { post, login } from '@/app/http';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 

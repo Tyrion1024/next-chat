@@ -5,7 +5,7 @@ import { FullMessageType } from "@/app/types";
 import { useState, useRef } from "react";
 import MessageBox from "./MessageBox";
 import { useEffect } from "react";
-import { post } from "@/app/(site)/http";
+import { post } from "@/app/http";
 import { toast } from "react-hot-toast";
 
 interface BodyProps {

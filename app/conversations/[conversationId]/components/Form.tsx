@@ -2,7 +2,7 @@
 
 import useConversation from "@/app/hooks/useConversation";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { post } from '@/app/(site)/http';
+import { post } from '@/app/http';
 import { HiPhoto, HiPaperAirplane } from "react-icons/hi2";
 import { CldUploadButton } from 'next-cloudinary';
 import MessageInput from "./MessageInput";

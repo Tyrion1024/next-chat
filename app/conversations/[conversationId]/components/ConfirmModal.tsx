@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 import useConversation from "../../../hooks/useConversation"
 import { useRouter } from "next/navigation"
-import { post } from "@/app/(site)/http"
+import { post } from "@/app/http"
 import toast from "react-hot-toast"
 import Modal from "@/app/components/Modal"
 import { FiAlertTriangle } from 'react-icons/fi'

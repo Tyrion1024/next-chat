@@ -7,7 +7,7 @@ import { Fragment, useMemo, useState } from "react"
 import { Dialog, Transition } from '@headlessui/react'
 import { IoClose, IoTrash } from 'react-icons/io5'
 import Avatar from "@/app/components/Avatar"
-import ConfirmModal from "@/app/conversations/[conversationId]/components/ConfirmModal"
+import ConfirmModal from "./ConfirmModal"
 
 interface ProfileDrawerProps {
   data: Conversation & {

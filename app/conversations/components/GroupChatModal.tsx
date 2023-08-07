@@ -1,6 +1,6 @@
 'use client'
 
-import { post } from "@/app/(site)/http"
+import { post } from "@/app/http"
 import Button from "@/app/components/Button"
 import Input from "@/app/components/Input"
 import Modal from "@/app/components/Modal"

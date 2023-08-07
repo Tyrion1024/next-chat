@@ -4,7 +4,7 @@ import { User } from ".prisma/client";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { post } from "@/app/(site)/http";
+import { post } from "@/app/http";
 import toast from "react-hot-toast";
 import Modal from "../Modal";
 import Input from "../Input";
