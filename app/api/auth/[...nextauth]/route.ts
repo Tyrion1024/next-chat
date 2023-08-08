@@ -13,20 +13,14 @@ export const authOptions: AuthOptions = {
       clientId: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_ID_DEV : process.env.GITHUB_ID) as string,
       clientSecret: (process.env.NODE_ENV === 'development' ? process.env.GITHUB_SECRET_DEV : process.env.GITHUB_SECRET) as string,
       httpOptions: {
-        timeout: 60000,
-        headers: {
-          "X-OAuth-Scopes": "user"
-        }
+        timeout: process.env.NODE_ENV === 'development' ? 60000 : 3500,
       }
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       httpOptions: {
-        timeout: 60000,
-        headers: {
-          "X-OAuth-Scopes": "user"
-        }
+        timeout: process.env.NODE_ENV === 'development' ? 60000 : 3500,
       }
     }),
     CredentialsProvider({
