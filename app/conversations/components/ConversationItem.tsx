@@ -9,6 +9,7 @@ import useOtherUser from "@/app/hooks/useOtherUser"
 import { User } from "@prisma/client"
 import Avatar from "@/app/components/Avatar"
 import { format } from 'date-fns';
+import AvatarGroup from "@/app/components/AvartarGroup"
 
 interface ConversationItemProps {
   data: FullConversationType
@@ -23,7 +24,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ data, selected = fa
 
   const lastMessage = useMemo(() => {
     const messages = data.message || []
-    return messages[data.message.length - 1]
+    return messages[messages.length - 1]
   }, [data.message])
 
 
@@ -73,11 +74,13 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ data, selected = fa
         selected ? 'bg-neutral-100': 'bg-white'
       )}
     >
-      <Avatar user={otherUser[0]} />
+      {
+        data?.isGroup ? <AvatarGroup users={data.users} /> : <Avatar user={otherUser} />
+      }
       <div className="min-w-0 flex-1">
         <div className="focus:outline-none">
           <div className="flex justify-between items-center mb-1">
-            <p className="text-md font-medium text-gray-900">{data.name || otherUser[0].name}</p>
+            <p className="text-md font-medium text-gray-900">{data.name || otherUser.name}</p>
             {lastMessage?.createdAt && (
               <p className="text-xs text-gray400 font-light">{format(new Date(lastMessage.createdAt), 'p')}</p>
             )}

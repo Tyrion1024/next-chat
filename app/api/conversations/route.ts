@@ -1,7 +1,7 @@
 import getCurrentUser from '@/app/actions/getCurrentUser';
 import Prisma from '@/app/libs/prismadb';
 import { resultHandler } from '../util';
-import { User } from '.prisma/client';
+import { pusherServer } from '@/app/libs/pusher';
 
 export async function POST(
   request: Request
@@ -9,11 +9,8 @@ export async function POST(
   try {
     const currentUser = await getCurrentUser();
 
-    if (!currentUser) {
-      return resultHandler(null, 401, 'Unauthorized')
-    }
 
-    if (!(currentUser as User)?.id || !(currentUser as User)?.email) {
+    if (!currentUser || !currentUser?.id || !currentUser?.email) {
       return resultHandler(null, 401, 'Unauthorized')
     }
 
@@ -38,7 +35,7 @@ export async function POST(
             connect: [
               ...members.map((member: { value: string }) => ({id: member.value})),
               {
-                id: (currentUser as User)?.id
+                id: currentUser?.id
               }
             ]
           }
@@ -48,14 +45,29 @@ export async function POST(
         }
       });
       
+      newConversation.users.forEach((user => {
+        if (user.email) {
+          pusherServer.trigger(user.email, 'conversation:new', newConversation)
+        }
+      }))
+
       return resultHandler(newConversation)
     }
 
     const singleConversation = await Prisma.conversation.findFirst({
       where: {
-        userIds: { 
-          hasEvery: [(currentUser as User)?.id, userId] 
-        }
+        OR: [
+          {
+            userIds: { 
+              equals: [currentUser?.id, userId]
+            }
+          },
+          {
+            userIds: { 
+              equals: [userId, currentUser?.id]
+            }
+          },
+        ]
       }
     })
 
@@ -71,7 +83,7 @@ export async function POST(
               id: userId
             },
             {
-              id: (currentUser as User)?.id
+              id: currentUser?.id
             }
           ]
         }
@@ -80,6 +92,13 @@ export async function POST(
         users: true
       }
     });
+
+
+    newConversation.users.forEach((user => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:new', newConversation)
+      }
+    }))
 
     return resultHandler(newConversation)
 

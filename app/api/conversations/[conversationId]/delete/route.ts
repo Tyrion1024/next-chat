@@ -1,7 +1,7 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { resultHandler } from "@/app/api/util";
 import Prisma from "@/app/libs/prismadb";
-import { Message, User } from "@prisma/client";
+import { pusherServer } from "@/app/libs/pusher";
 
 interface IParams {
   conversationId: string
@@ -14,7 +14,7 @@ export const POST = async (
   try {
     const currentUser = await getCurrentUser();
 
-    if (!currentUser || !(currentUser as User)?.id || !(currentUser as User)?.email) {
+    if (!currentUser || !currentUser?.id || !currentUser?.email) {
       return resultHandler(null, 401, 'Unauthorized')
     }
 
@@ -22,18 +22,18 @@ export const POST = async (
       conversationId
     } = params;
     
-    const conversation = Prisma.conversation.findUnique({
+    const conversation = await Prisma.conversation.findUnique({
       where: {id: conversationId},
       include: {
         users: true
       }
     })
 
-    if (!conversation || !conversation?.message) {
+    if (!conversation || !conversation.id) {
       return resultHandler(null, 400, 'Invalid Id');
     }
     
-    const deleteConversation = Prisma.conversation.deleteMany({
+    const deleteConversation = await Prisma.conversation.deleteMany({
       where: {
         id: conversationId,
         userIds: {
@@ -41,6 +41,14 @@ export const POST = async (
         }
       },
     })
+
+
+    conversation.users.forEach((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:delete', conversation)
+      }
+    });
+
 
     return resultHandler(deleteConversation)
 

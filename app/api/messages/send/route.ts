@@ -1,8 +1,7 @@
 import Prisma from '@/app/libs/prismadb';
 import { resultHandler } from '@/app/api/util';
 import getCurrentUser from '@/app/actions/getCurrentUser';
-import { User } from '@prisma/client';
-
+import { pusherServer } from '@/app/libs/pusher';
 
 export const POST = async (
   request: Request
@@ -10,7 +9,7 @@ export const POST = async (
   try {
     const currentUser = await getCurrentUser();
 
-    if (!currentUser || !(currentUser as User)?.id || !(currentUser as User)?.email) {
+    if (!currentUser || !currentUser?.id || !currentUser?.email) {
       return resultHandler(null, 401, 'Unauthorized')
     }
     const body = await request.json()
@@ -49,7 +48,7 @@ export const POST = async (
     })
 
 
-    await Prisma.conversation.update({
+    const updatedConversation = await Prisma.conversation.update({
       where: {
         id: conversationId
       },
@@ -71,9 +70,18 @@ export const POST = async (
       }
     })
 
+    await pusherServer.trigger(conversationId, 'message:new', newMessage)
 
+    const lastMessage = updatedConversation.message[updatedConversation.message.length - 1]
+
+    updatedConversation.users.map(user => {
+      pusherServer.trigger(user.email!, 'conversation:update', {
+        id: conversationId,
+        message: [lastMessage]
+      })
+    })
+    
     return resultHandler(newMessage);
-
   } catch(err: any) {
     return resultHandler(null, 500, `Server Error: ${err.message}`)
   }

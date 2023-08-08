@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import getCurrentUser from './getCurrentUser';
 import Prisma from '@/app/libs/prismadb';
 
@@ -17,7 +16,7 @@ export default async function getConversationList () {
       },
       where: {
         userIds: { 
-          has: (currentUser as User)?.id 
+          has: currentUser?.id 
         }
       },
       include: {

@@ -1,7 +1,8 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { resultHandler } from "@/app/api/util";
 import Prisma from "@/app/libs/prismadb";
-import { Message, User } from "@prisma/client";
+import { pusherServer } from "@/app/libs/pusher";
+import { Message } from "@prisma/client";
 
 interface IParams {
   conversationId: string
@@ -14,7 +15,7 @@ export const POST = async (
   try {
     const currentUser = await getCurrentUser();
 
-    if (!currentUser || !(currentUser as User)?.id || !(currentUser as User)?.email) {
+    if (!currentUser || !currentUser?.id || !currentUser?.email) {
       return resultHandler(null, 401, 'Unauthorized')
     }
 
@@ -59,6 +60,17 @@ export const POST = async (
         }
       }
     })
+
+    await pusherServer.trigger(currentUser.email!, 'conversation:update', {
+      id:conversationId,
+      message: [updateMessage]
+    })
+
+    if ((lastMessage as Message).seenIds.includes(currentUser.id)) {
+      return resultHandler(updateMessage)
+    }
+
+    await pusherServer.trigger(conversationId, 'message:update', updateMessage)
 
     return resultHandler(updateMessage)
 

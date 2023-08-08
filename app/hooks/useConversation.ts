@@ -9,7 +9,7 @@ const useConversation = () => {
       return '';
     }
 
-    return params.conversationId as string;
+    return params.conversationId;
   }, [params?.conversationId]);
 
 

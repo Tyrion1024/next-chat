@@ -1,7 +1,6 @@
 import Prisma from '@/app/libs/prismadb';
 import { resultHandler } from '@/app/api/util';
 import getCurrentUser from '@/app/actions/getCurrentUser';
-import { User } from '@prisma/client';
 
 
 export async function POST(
@@ -10,7 +9,7 @@ export async function POST(
   try {
     const currentUser = await getCurrentUser()
 
-    if (!currentUser || !(currentUser as User)?.id) {
+    if (!currentUser || !currentUser?.id) {
       return resultHandler(null, 401, 'Unauthorized')
     }
 

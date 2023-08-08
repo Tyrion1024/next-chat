@@ -4,10 +4,14 @@ import useConversation from '@/app/hooks/useConversation'
 import type { FullConversationType } from '@/app/types'
 import { MdOutlineGroupAdd } from 'react-icons/md';
 import clsx from 'clsx'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ConversationItem from './ConversationItem'
 import GroupChatModal from './GroupChatModal';
 import { User } from '@prisma/client';
+import { useSession } from 'next-auth/react';
+import { pusherClient } from '@/app/libs/pusher';
+import { find } from 'lodash';
+import { useRouter } from 'next/navigation';
 
 interface ConversationListProps {
   initialItems: FullConversationType[]
@@ -19,11 +23,67 @@ const ConversationList: React.FC<ConversationListProps> = ({
   users
 }) => {
 
+  const router = useRouter();
+
   const [ items, setItems ] = useState(initialItems)
 
   const { conversationId, isOpen } = useConversation();
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const session = useSession();
+  const pusherKey = useMemo(() => {
+    return session?.data?.user?.email
+  }, [session.data?.user?.email])
+
+  useEffect(() => {
+    if (!pusherKey) {
+      return;
+    }
+    const newHandler = (conversation: FullConversationType) => {
+      setItems((current) => {
+        if (find(current, {id: conversation.id})) {
+          return current
+        }
+
+        return [conversation, ...current]
+      })
+    }
+
+    const updateHander = (conversation: FullConversationType) => {
+      setItems((current) => current.map((currentConversation) => {
+        if (currentConversation.id === conversation.id) {
+          return {
+            ...currentConversation,
+            message: conversation.message
+          }
+        }
+
+        return currentConversation
+      }))
+    }
+
+    const deleteHander = (conversation: FullConversationType) => {
+      setItems((current) => {
+        return [...current.filter(c => c.id !== conversation.id)]
+      })
+      if (conversationId === conversation.id) {
+        router.replace('/conversations')
+      }
+    }
+
+    pusherClient.subscribe(pusherKey);
+    pusherClient.bind('conversation:new', newHandler);
+    pusherClient.bind('conversation:update', updateHander);
+    pusherClient.bind('conversation:delete', deleteHander);
+
+    return () => {
+      pusherClient.unsubscribe(pusherKey);
+      pusherClient.unbind('conversation:new', newHandler);
+      pusherClient.unbind('conversation:update', updateHander);
+      pusherClient.unbind('conversation:delete', deleteHander);
+    }
+  }, [pusherKey, conversationId, router])
 
   return (
     <>
@@ -31,7 +91,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
       <aside
         className={clsx(`
           fixed
-          left-20
+          lg:left-20
           inset-y-0
           pb-20
           lg:pb-20
