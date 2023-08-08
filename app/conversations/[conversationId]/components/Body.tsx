@@ -27,7 +27,7 @@ const Body: React.FC<BodyProps> = ({
   }, [conversationId])
 
   useEffect(() => {
-    pusherClient.subscribe(conversationId)
+    pusherClient.subscribe(conversationId as string)
     bottomRef?.current?.scrollIntoView()
 
     const messageHandler = (newMessage: FullMessageType) => {
@@ -55,7 +55,7 @@ const Body: React.FC<BodyProps> = ({
     pusherClient.bind('message:new', messageHandler)
     pusherClient.bind('message:update', updateMessageHandler)
     return () => {
-      pusherClient.unsubscribe(conversationId);
+      pusherClient.unsubscribe(conversationId as string);
       pusherClient.unbind('message:new', messageHandler)
       pusherClient.unbind('message:update', updateMessageHandler)
     }
