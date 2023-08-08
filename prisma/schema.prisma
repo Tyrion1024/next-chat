@@ -38,10 +38,11 @@ model Account {
   provider String
   providerAccountId String
   refresh_token String? @db.String
+  refresh_token_expires_in Int
   access_token String? @db.String
   expires_at Int?
   token_type String?
-  scop String?
+  scope String?
   id_token String? @db.String
   session_state String?
 
