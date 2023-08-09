@@ -42,7 +42,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ data, selected = fa
 
 
   const lastMessageText = useMemo(() => {
-    if (lastMessage?.image) return 'Send an image.';
+    if (lastMessage?.image) return '[photo]';
 
     if (lastMessage?.body) return lastMessage.body
 
@@ -89,7 +89,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ data, selected = fa
             truncate
             text-sm
           `,
-            hasSeen ? 'text-gray-500' : 'text-black font-medium'
+            hasSeen ? 'text-gray-500' : 'text-[#F94C31] font-bold'
           )}>{lastMessageText}</p>
         </div>
       </div>
